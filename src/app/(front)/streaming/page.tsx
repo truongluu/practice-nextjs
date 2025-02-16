@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Filter from "../components/Filter";
 import Gmap from "../components/Gmap";
-import { simulateFetching } from "../components/LowerContent";
+import { simulateFetching, User } from "../components/LowerContent";
 import SubComonent from "../components/SubComonent";
 
 type SearchParams = {
@@ -11,20 +11,29 @@ type SearchParams = {
 };
 
 type SearchResultProps = {
-  params: { slug: string[] };
   searchParams: Promise<SearchParams>;
 };
 
+const isClient = typeof window !== "undefined";
+
 export default function Streaming({ searchParams }: SearchResultProps) {
   const [page, setPage] = useState(1);
-  const [getData, setGetData] = useState<any>(async () => {
+  const [getData, setGetData] = useState<Promise<User[]>>(async () => {
     const searchParamsData = await searchParams;
     const page =
       typeof searchParamsData.page === "string"
         ? parseInt(searchParamsData.page)
         : 1;
+    console.log(
+      `useState updater function is called from ${
+        isClient ? "client" : "server"
+      }`
+    );
+
     return simulateFetching(page);
   });
+  console.log("getData is called", `${isClient ? "client" : "server"}`);
+
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
